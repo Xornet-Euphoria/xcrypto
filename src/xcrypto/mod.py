@@ -1,9 +1,14 @@
 from math import gcd
+from Crypto.Util.number import isPrime
 from xcrypto.util import prod, list_gcd
 
 
 def inv(x, n):
     return pow(x, -1, n)
+
+
+def neg(x, n):
+    return -x % n
 
 
 def ext_euclid(a, b):
@@ -51,3 +56,61 @@ def crt(problem):
         answer += (a_list[i] * m_star_list[i] * t_list[i])
 
     return answer % m_all_prod
+
+
+def is_quadratic_residue(a, p):
+    if a % p == 0:
+        return True
+
+    return legendre_symbol(a, p) == 1
+
+
+def legendre_symbol(a, p):
+    if not isPrime(p) or p == 2:
+        raise ValueError("p must be a odd prime number")
+
+    return pow(a, (p-1) // 2, p)
+
+
+def get_q_s(p):
+    q = p - 1
+    s = 0
+    while q % 2 == 0:
+        q //= 2
+        s += 1
+
+    return (q, s)
+
+
+def get_nonresidue(p):
+    ret = 2
+    while is_quadratic_residue(ret, p):
+        ret += 1
+
+    return ret
+
+
+def tonelli_shanks(a, p):
+    if not is_quadratic_residue(a, p):
+        return ()
+
+    if a == 0:
+        return 0
+
+    q, s = get_q_s(p)
+    z = get_nonresidue(p)
+    m, c, t, r = s, pow(z, q, p), pow(a, q, p), pow(a, (q+1) // 2, p)
+
+    while True:
+        if t == 1:
+            return (r, neg(r, p))
+
+        i = m
+        for j in range(1, m):
+            if pow(t, pow(2, j), p) == 1:
+                i = j
+                break
+
+        b = pow(c, pow(2, m - i - 1), p)
+        b_pow = pow(b, 2, p)
+        m, c, t, r = i, b_pow, t * b_pow % p, r * b % p
