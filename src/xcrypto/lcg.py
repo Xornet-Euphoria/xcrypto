@@ -1,4 +1,4 @@
-from xcrypto.util import list_gcd
+from xcrypto.num_util import list_gcd
 
 
 def next_lcg(a, b, m, x):

@@ -1,6 +1,6 @@
 from math import gcd
 from Crypto.Util.number import isPrime
-from xcrypto.util import prod, list_gcd
+from xcrypto.num_util import prod, list_gcd
 
 
 def inv(x, n):
