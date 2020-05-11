@@ -69,7 +69,12 @@ def legendre_symbol(a, p):
     if not isPrime(p) or p == 2:
         raise ValueError("p must be a odd prime number")
 
-    return pow(a, (p-1) // 2, p)
+    if a % p == 0:
+        return 0
+
+    ret = pow(a, (p-1) // 2, p)
+
+    return ret if ret == 1 else -ret
 
 
 def get_q_s(p):
