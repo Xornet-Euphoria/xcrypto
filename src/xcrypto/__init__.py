@@ -5,3 +5,4 @@ from .rsa import *
 from .rcf import *
 from .lcg import *
 from .prime import *
+from .dlp import *
