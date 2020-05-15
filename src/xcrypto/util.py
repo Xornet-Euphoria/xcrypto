@@ -25,3 +25,12 @@ def dump_num(num, msg="decode error"):
         print(res)
     except:
         print(msg)
+
+
+def zero_pad_hex(num):
+    ret = hex(num)[2:]
+
+    if len(ret) % 2 == 1:
+        ret = '0' + ret
+
+    return ret
