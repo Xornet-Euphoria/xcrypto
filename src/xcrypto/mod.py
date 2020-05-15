@@ -1,4 +1,5 @@
 from math import gcd
+from functools import reduce
 from Crypto.Util.number import isPrime
 from xcrypto.num_util import prod, list_gcd
 
@@ -9,6 +10,10 @@ def inv(x, n):
 
 def neg(x, n):
     return -x % n
+
+
+def lcm(a, b):
+    return a * b // gcd(a, b)
 
 
 def ext_euclid(a, b):
@@ -33,6 +38,35 @@ def ext_euclid(a, b):
 
 
 # chinese reminder theorem
+def two_crt(a_1, m_1, a_2, m_2):
+    # todo: 互いに素で無い場合でも解けることの確認とその解法
+    if gcd(m_1, m_2) != 1:
+        raise ValueError("modulos pair must be coprime each other")
+    u, v, g = ext_euclid(m_1, m_2)
+    assert gcd(m_1, m_2) == g
+
+    return (a_1 * m_2 * v + a_2 * m_1 * u) % (m_1 * m_2)
+
+
+def _two_crt_tuple(t1, t2):
+    return (two_crt(t1[0], t1[1], t2[0], t2[1]), lcm(t1[1], t2[1]))
+
+
+def crt(problem):
+    m_list = [x[1] for x in problem]
+
+    for i in m_list:
+        for j in m_list:
+            if i == j:
+                continue
+            if gcd(i, j) != 1:
+                raise ValueError("any 2 modulo pair must be coprime each other")
+
+    return reduce(lambda x, y: _two_crt_tuple(x, y), problem)[0]
+
+
+# old code (this code did not use `reduce` and is non-functional)
+"""
 def crt(problem):
     eq_count = len(problem)
     a_list = [x[0] for x in problem]
@@ -56,6 +90,7 @@ def crt(problem):
         answer += (a_list[i] * m_star_list[i] * t_list[i])
 
     return answer % m_all_prod
+"""
 
 
 def is_quadratic_residue(a, p):
