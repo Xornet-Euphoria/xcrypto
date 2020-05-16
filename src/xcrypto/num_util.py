@@ -10,6 +10,10 @@ def list_gcd(num_list):
     return reduce(gcd, num_list)
 
 
+def lcm(a, b):
+    return a * b // gcd(a, b)
+
+
 # return integer number less than or equal to pow(x, (1/n))
 def int_nth_root(x, n):
     b_length = x.bit_length()

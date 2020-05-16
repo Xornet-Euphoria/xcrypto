@@ -1,7 +1,12 @@
 from math import gcd
 from functools import reduce
 from Crypto.Util.number import isPrime
-from xcrypto.num_util import prod, list_gcd
+from xcrypto.num_util import prod, list_gcd, lcm
+
+
+# I hate `%` operator...
+def mod_f(x, n):
+    return x % n
 
 
 def inv(x, n):
@@ -12,8 +17,8 @@ def neg(x, n):
     return -x % n
 
 
-def lcm(a, b):
-    return a * b // gcd(a, b)
+def is_equivalent(a, b, n):
+    return (a - b) % n == 0
 
 
 def ext_euclid(a, b):
@@ -38,14 +43,22 @@ def ext_euclid(a, b):
 
 
 # chinese reminder theorem
+def _is_two_crt_solvable(a_1, m_1, a_2, m_2):
+    g = gcd(m_1, m_2)
+    return is_equivalent(a_1, a_2, g)
+
+
 def two_crt(a_1, m_1, a_2, m_2):
     # todo: 互いに素で無い場合でも解けることの確認とその解法
-    if gcd(m_1, m_2) != 1:
-        raise ValueError("modulos pair must be coprime each other")
+    if not _is_two_crt_solvable(a_1, m_1, a_2, m_2):
+        return None
     u, v, g = ext_euclid(m_1, m_2)
-    assert gcd(m_1, m_2) == g
+    l = lcm(m_1, m_2)
 
-    return (a_1 * m_2 * v + a_2 * m_1 * u) % (m_1 * m_2)
+    k = (a_2 - a_1) // g
+    assert a_1 + k * m_1 * u == a_2 - k * m_2 * v
+
+    return mod_f(a_1 + k * m_1 * u, l)
 
 
 def _two_crt_tuple(t1, t2):
@@ -53,14 +66,15 @@ def _two_crt_tuple(t1, t2):
 
 
 def crt(problem):
+    a_list = [x[0] for x in problem]
     m_list = [x[1] for x in problem]
 
-    for i in m_list:
-        for j in m_list:
+    for i in range(len(m_list)):
+        for j in range(len(m_list)):
             if i == j:
                 continue
-            if gcd(i, j) != 1:
-                raise ValueError("any 2 modulo pair must be coprime each other")
+            if not _is_two_crt_solvable(a_list[i], m_list[i], a_list[j], m_list[j]):
+                return None
 
     return reduce(lambda x, y: _two_crt_tuple(x, y), problem)[0]
 
