@@ -32,7 +32,7 @@ def baby_step_giant_step(g, y, p, q=None):
 # required: list of prime factors 
 # the factor of list is tuple: (base, exponent)
 # ex. p = 73 (phi(p) = 72 = 2**3 * 3**2), factorized_phi_list = [(2, 3), (3, 2)]
-def pohlig_hellman(g, y, p, factorized_phi_list):
+def pohlig_hellman(g, y, p, factorized_phi_list, log=False):
     if isPrime(p):
         phi_p = p - 1
     else:
@@ -43,6 +43,8 @@ def pohlig_hellman(g, y, p, factorized_phi_list):
     problem = []
 
     for q, e in factorized_phi_list:
+        if log:
+            print("[+]: trying", q)
         q_e = pow(q, e)
         exp_i = phi_p // q_e
         g_i = pow(g, exp_i, p)
