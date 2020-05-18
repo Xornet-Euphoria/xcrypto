@@ -1,4 +1,19 @@
 from xcrypto.num_util import *
+from Crypto.Util.number import isPrime
+
+
+def is_prime(n):
+    """
+    wrapper of Crypto.Util.number.isPrime
+    `isPrime()` returns `1` when number is odd prime
+    I hate this!!
+    """
+    res = isPrime(n)
+
+    if res == 1 or res == True:
+        return True
+
+    return False
 
 
 def fermat_method(n):
